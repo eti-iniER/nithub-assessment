@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from core.managers import UserManager
+from core.querysets import ProductQuerySet
 
 # Create your models here.
 
@@ -19,7 +20,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     def __str__(self):
-        return self.email
+        return f"{self.first_name} {self.last_name} ({self.email})"
 
     def __repr__(self):
         return f"<User: id={self.id} email={self.email}>"
@@ -32,6 +33,8 @@ class Product(models.Model):
     available_quantity = models.PositiveIntegerField()
     last_restocked = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = ProductQuerySet.as_manager()
 
     def __str__(self):
         return self.name
