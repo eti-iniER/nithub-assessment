@@ -69,6 +69,7 @@ class UserViewSet(ModelViewSet):
 )
 class OrderViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminUser]
+    queryset = Order.objects.all()
 
     def get_throttles(self):
         if self.action == "create":
