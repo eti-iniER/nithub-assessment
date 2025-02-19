@@ -2,6 +2,10 @@ from rest_framework.throttling import BaseThrottle
 
 
 class UserCreateThrottle(BaseThrottle):
+    """
+    Throttles the number of user creation requests that can be made in a given time period.
+    """
+
     scope = "user_create"
 
     def allow_request(self, request, view):
