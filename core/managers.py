@@ -1,7 +1,8 @@
 from django.contrib.auth.models import BaseUserManager
+from core.querysets import UserQuerySet
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
     """
     Custom user model manager where the user's email address is the unique identifier
     """

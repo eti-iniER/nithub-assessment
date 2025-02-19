@@ -15,3 +15,18 @@ class ProductQuerySet(models.QuerySet):
         return self.filter(id=product_id).update(
             available_quantity=models.F("available_quantity") + additional_quantity
         )
+
+
+class UserQuerySet(models.QuerySet):
+
+    def active(self):
+        return self.filter(is_active=True)
+
+    def inactive(self):
+        return self.filter(is_active=False)
+
+    def staff(self):
+        return self.filter(is_staff=True)
+
+    def customers(self):
+        return self.filter(is_staff=False)
