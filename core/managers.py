@@ -1,6 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
-from django.db.models import Manager
+from django.db.models import Manager, Sum
 from core.querysets import UserQuerySet, OrderQuerySet
+from core.exceptions import InsufficientStockError, InvalidProductError
 
 
 class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
@@ -36,20 +37,36 @@ class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
 
 
 class OrderManager(Manager.from_queryset(OrderQuerySet)):
+
     def create_order(self, user, items):
-        from core.models import OrderItem
+        from core.models import OrderItem, Product
 
-        order = self.create(user=user)
+        # total_price = 0 is temporary. We will compute the total price shortly
+        order = self.create(user=user, total_price=0)
 
-        order_items = [
-            OrderItem(
-                order=order,
-                product=item["product"],
-                quantity=item["quantity"],
-                total_price_at_purchase=item["quantity"] * item["product"].price,
+        order_items = []
+
+        for item in items:
+            product = item["product"]
+            quantity = item["quantity"]
+
+            try:
+                Product.objects.decrease_stock(product.id, quantity)
+            except (InsufficientStockError, InvalidProductError) as e:
+                order.delete()
+                raise e
+
+            order_item_total_price_at_purchase = quantity * product.price
+
+            order_items.append(
+                OrderItem(
+                    order=order,
+                    product=product,
+                    quantity=quantity,
+                    total_price_at_purchase=order_item_total_price_at_purchase,
+                )
             )
-            for item in items
-        ]
+
         OrderItem.objects.bulk_create(order_items)
 
         return order
