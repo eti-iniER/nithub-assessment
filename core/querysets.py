@@ -1,4 +1,5 @@
 from django.db import models
+from core.exceptions import InsufficientStockError, InvalidProductError
 
 
 class ProductQuerySet(models.QuerySet):
@@ -15,6 +16,17 @@ class ProductQuerySet(models.QuerySet):
         return self.filter(id=product_id).update(
             available_quantity=models.F("available_quantity") + additional_quantity
         )
+
+    def decrease_stock(self, product_id, quantity):
+
+        updated_rows = self.filter(
+            id=product_id, available_quantity__gte=quantity
+        ).update(available_quantity=models.F("available_quantity") - quantity)
+
+        if updated_rows == 0:
+            raise InsufficientStockError(
+                f"Not enough stock for Product ID {product_id}."
+            )
 
 
 class UserQuerySet(models.QuerySet):
