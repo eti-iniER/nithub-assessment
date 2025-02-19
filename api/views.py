@@ -26,14 +26,14 @@ class ProductViewSet(ModelViewSet):
         return ProductSerializer
 
     def get_permissions(self):
-        permissions = [IsAuthenticated]
+        self.permission_classes = [IsAuthenticated]
 
         if self.action in ["create", "update", "partial_update", "destroy"]:
-            permissions = [IsAuthenticated, IsAdminUser]
+            self.permission_classes = [IsAuthenticated, IsAdminUser]
         elif self.action in ["list", "retrieve"]:
-            permissions = [AllowAny]
+            self.permission_classes = [AllowAny]
 
-        return [permission() for permission in permissions]
+        return super().get_permissions()
 
 
 class UserViewSet(ModelViewSet):
@@ -50,13 +50,13 @@ class UserViewSet(ModelViewSet):
         return UserSerializer
 
     def get_permissions(self):
+
         if self.action == "create":
-            return [AllowAny()]
+            self.permission_classes = [AllowAny]
 
         if self.action == "retrieve":
-            return [IsAuthenticated(), IsOwner() | IsAdminUser()]
+            self.permission_classes = [IsAuthenticated, IsOwner | IsAdminUser]
 
-        return [
-            IsAuthenticated(),
-            IsAdminUser(),
-        ]
+        self.permission_classes = [IsAuthenticated, IsAdminUser]
+
+        return super().get_permissions()
