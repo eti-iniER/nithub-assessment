@@ -5,6 +5,8 @@ from core.querysets import ProductQuerySet
 
 # Create your models here.
 
+DELETED_PRODUCT_ID = 1
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255)
@@ -30,7 +32,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     price = models.PositiveIntegerField()
     description = models.TextField()
-    available_quantity = models.PositiveIntegerField()
+    available_quantity = models.PositiveIntegerField(default=1)
     last_restocked = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -57,8 +59,10 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    product = models.ForeignKey(
+        Product, on_delete=models.SET_DEFAULT, default=DELETED_PRODUCT_ID
+    )
+    quantity = models.PositiveIntegerField(default=1)
     total_price = models.PositiveIntegerField()
 
     def __str__(self):
