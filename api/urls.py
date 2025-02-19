@@ -5,11 +5,12 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from rest_framework.routers import DefaultRouter
-from api.views import ProductViewSet, UserViewSet
+from api.views import ProductViewSet, UserViewSet, OrderViewSet
 
 router = DefaultRouter()
 router.register("products", ProductViewSet, basename="products")
 router.register("users", UserViewSet, basename="users")
+router.register("orders", OrderViewSet, basename="orders")
 
 urlpatterns = [
     path("schema/", SpectacularAPIView.as_view(), name="schema"),

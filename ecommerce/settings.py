@@ -68,7 +68,8 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "5/second",
         "user": "10/second",
-        "user_create": "1/minute",
+        "user_create": "1/hour",
+        "order_create": "10/minute",
     },
 }
 

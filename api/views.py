@@ -1,9 +1,10 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from core.permissions import IsOwner
-from core.models import Product, User
+from core.models import Product
 from api.serializers import *
-from api.throttles import UserCreateThrottle
+from api.throttles import UserCreateThrottle, OrderCreateThrottle
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
 # Create your views here.
 
@@ -37,6 +38,9 @@ class ProductViewSet(ModelViewSet):
 
 
 class UserViewSet(ModelViewSet):
+    serializer_class = StaffUserSerializer
+    queryset = User.objects.all()
+
     def get_throttles(self):
         if self.action == "create":
             return [UserCreateThrottle()]
@@ -50,13 +54,46 @@ class UserViewSet(ModelViewSet):
         return UserSerializer
 
     def get_permissions(self):
+        self.permission_classes = [IsAuthenticated, IsAdminUser]
 
         if self.action == "create":
             self.permission_classes = [AllowAny]
-
-        if self.action == "retrieve":
+        elif self.action == "retrieve":
             self.permission_classes = [IsAuthenticated, IsOwner | IsAdminUser]
 
-        self.permission_classes = [IsAuthenticated, IsAdminUser]
+        return super().get_permissions()
+
+
+@extend_schema_view(
+    create=extend_schema(request=CreateOrderSerializer),
+)
+class OrderViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get_throttles(self):
+        if self.action == "create":
+            return [OrderCreateThrottle()]
+        return super().get_throttles()
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return Order.objects.all()
+        return Order.objects.for_user(user)
+
+    def get_serializer_class(self):
+        user = self.request.user
+
+        if user.is_staff:
+            return StaffOrderSerializer
+        return OrderSerializer
+
+    def get_permissions(self):
+        if self.action == "create":
+            self.permission_classes = [IsAuthenticated]
 
         return super().get_permissions()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

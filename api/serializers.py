@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Product, User
+from core.models import Product, User, Order
 
 
 class StaffProductSerializer(serializers.ModelSerializer):
@@ -46,3 +46,42 @@ class ProductSerializer(serializers.ModelSerializer):
             "description",
             "available_quantity",
         )
+
+
+class StaffOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = (
+            "id",
+            "user",
+            "total_price",
+            "created_at",
+        )
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = (
+            "id",
+            "total_price",
+            "created_at",
+        )
+
+
+class CreateOrderItemSerializer(serializers.Serializer):
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(),
+        error_messages={"does_not_exist": "One or more selected products are invalid."},
+    )
+    quantity = serializers.IntegerField(min_value=1)
+
+
+class CreateOrderSerializer(serializers.Serializer):
+    items = CreateOrderItemSerializer(many=True)
+
+    def create(self, validated_data):
+        user = validated_data["user"]
+        items = validated_data.pop("items")
+
+        return Order.objects.create_order(user, items)
