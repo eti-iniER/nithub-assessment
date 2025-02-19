@@ -30,3 +30,15 @@ class UserQuerySet(models.QuerySet):
 
     def customers(self):
         return self.filter(is_staff=False)
+
+
+class OrderQuerySet(models.QuerySet):
+
+    def for_user(self, user):
+        return self.filter(user=user)
+
+    def total_price(self) -> int:
+        return self.aggregate(total_price=models.Sum("total_price"))["total_price"] or 0
+
+    def filter_by_date(self, date):
+        return self.filter(created_at__date=date)

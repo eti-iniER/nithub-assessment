@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from core.managers import UserManager
+from core.managers import UserManager, OrderManager
 from core.querysets import ProductQuerySet
 
 # Create your models here.
@@ -50,6 +50,8 @@ class Order(models.Model):
     total_price = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    objects = OrderManager()
+
     def __str__(self):
         return self.id
 
@@ -63,7 +65,7 @@ class OrderItem(models.Model):
         Product, on_delete=models.SET_DEFAULT, default=DELETED_PRODUCT_ID
     )
     quantity = models.PositiveIntegerField(default=1)
-    total_price = models.PositiveIntegerField()
+    total_price_at_purchase = models.PositiveIntegerField()
 
     def __str__(self):
         return self.product.name

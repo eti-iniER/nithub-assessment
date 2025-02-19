@@ -1,5 +1,6 @@
 from django.contrib.auth.models import BaseUserManager
-from core.querysets import UserQuerySet
+from django.db.models import Manager
+from core.querysets import UserQuerySet, OrderQuerySet
 
 
 class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
@@ -32,3 +33,23 @@ class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
         if fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
         return self.create_user(email, password, **fields)
+
+
+class OrderManager(Manager.from_queryset(OrderQuerySet)):
+    def create_order(self, user, items):
+        from core.models import OrderItem
+
+        order = self.create(user=user)
+
+        order_items = [
+            OrderItem(
+                order=order,
+                product=item["product"],
+                quantity=item["quantity"],
+                total_price_at_purchase=item["quantity"] * item["product"].price,
+            )
+            for item in items
+        ]
+        OrderItem.objects.bulk_create(order_items)
+
+        return order
