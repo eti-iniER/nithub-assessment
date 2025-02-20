@@ -11,6 +11,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 
 class ProductViewSet(ModelViewSet):
     serializer_class = StaffProductSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_queryset(self):
         user = self.request.user
@@ -27,11 +28,7 @@ class ProductViewSet(ModelViewSet):
         return ProductSerializer
 
     def get_permissions(self):
-        self.permission_classes = [IsAuthenticated]
-
-        if self.action in ["create", "update", "partial_update", "destroy"]:
-            self.permission_classes = [IsAuthenticated, IsAdminUser]
-        elif self.action in ["list", "retrieve"]:
+        if self.action in ["list", "retrieve"]:
             self.permission_classes = [AllowAny]
 
         return super().get_permissions()
@@ -40,6 +37,7 @@ class ProductViewSet(ModelViewSet):
 class UserViewSet(ModelViewSet):
     serializer_class = StaffUserSerializer
     queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_throttles(self):
         if self.action == "create":
@@ -54,11 +52,9 @@ class UserViewSet(ModelViewSet):
         return UserSerializer
 
     def get_permissions(self):
-        self.permission_classes = [IsAuthenticated, IsAdminUser]
-
         if self.action == "create":
             self.permission_classes = [AllowAny]
-        elif self.action == "retrieve":
+        elif self.action in ["retrieve", "update", "partial_update"]:
             self.permission_classes = [IsAuthenticated, IsOwner | IsAdminUser]
 
         return super().get_permissions()
@@ -91,7 +87,7 @@ class OrderViewSet(ModelViewSet):
         return OrderSerializer
 
     def get_permissions(self):
-        if self.action == "create":
+        if self.action in ["create", "list", "retrieve"]:
             self.permission_classes = [IsAuthenticated]
 
         return super().get_permissions()

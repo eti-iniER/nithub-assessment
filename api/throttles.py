@@ -1,7 +1,7 @@
-from rest_framework.throttling import BaseThrottle
+from rest_framework.throttling import ScopedRateThrottle
 
 
-class UserCreateThrottle(BaseThrottle):
+class UserCreateThrottle(ScopedRateThrottle):
     """
     Throttles the number of user creation requests that can be made in a given time period.
     """
@@ -14,7 +14,7 @@ class UserCreateThrottle(BaseThrottle):
         return super().allow_request(request, view)
 
 
-class OrderCreateThrottle(BaseThrottle):
+class OrderCreateThrottle(ScopedRateThrottle):
     """
     Throttles the number of orders that can be made in a given time period.
     """

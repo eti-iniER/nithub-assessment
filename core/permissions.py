@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from core.models import User
 
 
 class IsOwner(BasePermission):
@@ -8,4 +9,6 @@ class IsOwner(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        if isinstance(obj, User):
+            return obj == request.user
         return obj.user == request.user
