@@ -5,10 +5,14 @@ from core.constants import DELETED_PRODUCT_ID
 from core.utils import convert_kobo_to_naira
 from django.contrib import admin
 from django.db.models import Sum
+from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 
 # Register your models here.
 
-admin.site.register(User)
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_filter = ("is_staff",)
 
 
 @admin.register(Product)
