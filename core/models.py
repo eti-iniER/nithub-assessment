@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from core.managers import UserManager, OrderManager
@@ -114,5 +115,9 @@ class OrderItem(models.Model):
         return f"<OrderItem: id={self.id} order_id={self.order.id} product={self.product.name}>"
 
     def save(self, *args, **kwargs):
+        # Prevent users from ordering the deleted product
+        if self.product.id == DELETED_PRODUCT_ID:
+            raise ValidationError("You cannot order a deleted product.")
+
         self.total_price_at_purchase = self.quantity * self.product.price
         super().save(*args, **kwargs)
