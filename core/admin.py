@@ -18,6 +18,7 @@ class ProductAdmin(admin.ModelAdmin):
         "formatted_price",
         "description",
         "formatted_available_quantity",
+        "last_restocked",
     ]
     form = ProductAdminForm
 

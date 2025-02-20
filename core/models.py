@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from core.managers import UserManager, OrderManager
 from core.querysets import ProductQuerySet
@@ -42,6 +43,18 @@ class Product(models.Model):
 
     def __repr__(self):
         return f"<Product: id={self.id} name={self.name}>"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_product = (
+                Product.objects.filter(pk=self.pk).only("available_quantity").first()
+            )
+            if old_product and self.available_quantity > old_product.available_quantity:
+                self.last_restocked = (
+                    timezone.now()
+                )  # Update last_restocked only if stock increased
+
+        super().save(*args, **kwargs)
 
 
 class Order(models.Model):
