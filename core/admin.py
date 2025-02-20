@@ -13,14 +13,23 @@ admin.site.register(User)
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["name", "formatted_price", "description", "available_quantity"]
+    list_display = [
+        "name",
+        "formatted_price",
+        "description",
+        "formatted_available_quantity",
+    ]
     form = ProductAdminForm
 
     def formatted_price(self, obj):
         """Convert price from kobo to naira and format properly."""
         return f"₦{convert_kobo_to_naira(obj.price):,.2f}"
 
+    def formatted_available_quantity(self, obj):
+        return f"{obj.available_quantity:,}"
+
     formatted_price.short_description = "Price (₦)"
+    formatted_available_quantity.short_description = "Available Quantity"
 
     def get_queryset(self, request):
         """Exclude the DeletedProduct from the admin product list."""
