@@ -1,8 +1,11 @@
 from django.db import models
-from core.exceptions import InsufficientStockError, InvalidProductError
+from core.exceptions import InsufficientStockError
+from core.constants import DELETED_PRODUCT_ID
 
 
 class ProductQuerySet(models.QuerySet):
+    def all_except_deleted(self):
+        return self.exclude(id=DELETED_PRODUCT_ID)
 
     def available(self, required_quantity=1):
         return self.filter(available_quantity__gte=required_quantity)

@@ -16,7 +16,7 @@ class ProductViewSet(ModelViewSet):
         user = self.request.user
 
         if user.is_staff:
-            return Product.objects.all()
+            return Product.objects.all_except_deleted()
         return Product.objects.available()
 
     def get_serializer_class(self):
