@@ -3,6 +3,7 @@ from core.models import User, Product, Order, OrderItem
 from core.forms import ProductAdminForm, OrderItemInlineForm
 from core.constants import DELETED_PRODUCT_ID
 from core.utils import convert_kobo_to_naira
+from core.filters import StockStatusFilter
 from django.contrib import admin
 from django.db.models import Sum
 from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
@@ -13,6 +14,7 @@ from django.contrib.auth.admin import UserAdmin as DefaultUserAdmin
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_filter = ("is_staff",)
+    search_fields = ["email", "first_name", "last_name"]
 
 
 @admin.register(Product)
@@ -24,6 +26,8 @@ class ProductAdmin(admin.ModelAdmin):
         "formatted_available_quantity",
         "last_restocked",
     ]
+    list_filter = [StockStatusFilter]
+    search_fields = ["name"]
     form = ProductAdminForm
 
     def formatted_price(self, obj):
@@ -67,6 +71,8 @@ class OrderAdmin(admin.ModelAdmin):
         "formatted_price",
         "created_at",
     ]
+    search_fields = ["user__email", "user__first_name", "user__last_name"]
+    list_filter = ["created_at"]
     list_display_links = ["info"]
     inlines = [OrderItemInline]
 
