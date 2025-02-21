@@ -66,7 +66,7 @@ I extensively customized the Django admin panel, to ensure that site administrat
 
 ## 6. Utility scripts
 
-Following recommended practices, I decided to implement utility scripts as custom management commands. To run the CSV migration, for example, you only need to run `python manage.py import_from_csv ./path/to/csv/file.csv`.
+Following recommended practices, I decided to implement utility scripts as custom management commands. To run the CSV migration, for example, you only need to run `python manage.py import_products ./path/to/csv/file.csv`.
 
 This bypasses the need for authentication (as only system administrators can run the management script) and speeds up the process, since we can communicate directly with Django's ORM without the API as a middleman.
 
