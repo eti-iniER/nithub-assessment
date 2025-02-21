@@ -1,5 +1,5 @@
 from django.db import models
-from core.exceptions import InsufficientStockError
+from core.exceptions import InsufficientStockError, InvalidProductError
 from core.constants import DELETED_PRODUCT_ID
 
 
@@ -21,6 +21,11 @@ class ProductQuerySet(models.QuerySet):
         )
 
     def decrease_stock(self, product_id, quantity):
+        """Atomically decrease stock while ensuring availability."""
+        if not self.filter(id=product_id).exists():
+            raise InvalidProductError(f"Product ID {product_id} does not exist.")
+        elif product_id == DELETED_PRODUCT_ID:
+            raise InvalidProductError(f"Product ID {product_id} is invalid.")
 
         updated_rows = self.filter(
             id=product_id, available_quantity__gte=quantity
