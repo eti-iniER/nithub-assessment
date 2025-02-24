@@ -8,6 +8,15 @@ This is my implementation of a simple e-commerce backend and API, as described i
 -   Admin customization
 -   Testing
 
+The application is live at [this URL](https://etini.pythonanywhere.com/api/docs/). You may authenticate using the following details:
+
+<details>
+<summary>Authentication details</summary>
+
+    Email: admin@admin.com
+    Password: nithubassessment
+
+</details>
 I'll discuss each aspect of the implementation below.
 
 ## 0. Code structure
@@ -30,7 +39,7 @@ For token authentication, I chose to use DRF Simple JWT, a popular library for i
 
 Unauthenticated/anonymous users can only perform limited actions, such as viewing the available product catalogue, and creating user accounts.
 
-I have also implemented basic password reset functionality.
+For testing purposes, you may access the application
 
 ## 3. Optimizations
 
